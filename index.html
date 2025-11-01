@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: 'Pretendard', -apple-system, sans-serif;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #ffeef8 0%, #ffe5f5 100%);
             min-height: 100vh;
             padding: 20px;
@@ -96,16 +96,9 @@
             display: flex;
             align-items: center;
             margin-bottom: 20px;
-            cursor: pointer;
             padding: 15px;
             background: linear-gradient(135deg, #ffe5f5 0%, #fff 100%);
             border-radius: 15px;
-            transition: all 0.3s;
-        }
-
-        .section-header:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
         }
 
         .section-icon {
@@ -128,6 +121,42 @@
             font-size: 0.9em;
         }
 
+        .add-item-container {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .add-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ffe5f5;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .add-input:focus {
+            outline: none;
+            border-color: #ff69b4;
+        }
+
+        .add-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
         .checklist-item {
             display: flex;
             align-items: center;
@@ -137,7 +166,6 @@
             background: white;
             border: 2px solid #ffe5f5;
             transition: all 0.3s;
-            position: relative;
         }
 
         .checklist-item:hover {
@@ -172,16 +200,21 @@
             line-height: 1.5;
         }
 
-        .date-badge {
-            position: absolute;
-            top: -10px;
-            right: 10px;
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
+        .delete-btn {
+            background: #ff6b6b;
             color: white;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 0.75em;
-            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background: #ff5252;
+            transform: scale(1.1);
         }
 
         .footer {
@@ -204,31 +237,11 @@
             color: #ff1493;
         }
 
-        .reset-btn {
-            margin-top: 20px;
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #ff69b4, #ff1493);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
-        }
-
-        .reset-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
-        }
-
-        .heart-animation {
-            position: fixed;
-            pointer-events: none;
-            font-size: 2em;
-            animation: float-up 2s ease-out forwards;
-            z-index: 1000;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #ff69b4;
+            font-size: 1.2em;
         }
 
         @keyframes float-up {
@@ -249,6 +262,9 @@
             h1 {
                 font-size: 1.8em;
             }
+            .add-item-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -257,370 +273,331 @@
         <h1>💕 수다 위시리스트 💕</h1>
         <p class="subtitle">함께 만들어가는 우리의 버킷리스트</p>
 
-        <div class="progress-container">
-            <div class="progress-stats">
-                <div class="stat">
-                    <div class="stat-number" id="totalCount">0</div>
-                    <div class="stat-label">전체 목표</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number" id="completedCount">0</div>
-                    <div class="stat-label">완료</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number" id="remainingCount">0</div>
-                    <div class="stat-label">남은 목표</div>
-                </div>
-            </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar" id="progressBar">0%</div>
-            </div>
-        </div>
+        <div class="loading" id="loading">데이터 불러오는 중... 💫</div>
 
-        <!-- 수영 섹션 -->
-        <div class="section">
-            <div class="section-header" onclick="toggleSection('suyoung')">
-                <span class="section-icon">🏊‍♀️</span>
-                <h2 class="section-title">수영의 위시리스트</h2>
-                <span class="section-count" id="suyoung-count">0/0</span>
-            </div>
-            <div id="suyoung-list">
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy1" onchange="saveProgress()">
-                    <label for="sy1">드라이브 하고 근교 맛집 가기(ex. 간장게장)</label>
+        <div id="mainContent" style="display: none;">
+            <div class="progress-container">
+                <div class="progress-stats">
+                    <div class="stat">
+                        <div class="stat-number" id="totalCount">0</div>
+                        <div class="stat-label">전체 목표</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="completedCount">0</div>
+                        <div class="stat-label">완료</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="remainingCount">0</div>
+                        <div class="stat-label">남은 목표</div>
+                    </div>
                 </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy2" onchange="saveProgress()">
-                    <label for="sy2">다위내 교회 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy3" onchange="saveProgress()">
-                    <label for="sy3">다위랑 스티커 사진 찍기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy4" onchange="saveProgress()">
-                    <label for="sy4">다위랑 바다 놀러가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy5" onchange="saveProgress()">
-                    <label for="sy5">낚시</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy6" onchange="saveProgress()">
-                    <label for="sy6">연차내고 다위랑 하루종일 같이 지내기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy7" onchange="saveProgress()">
-                    <label for="sy7">롯데월드 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy8" onchange="saveProgress()">
-                    <label for="sy8">합주하기(트리오나 듀엣으로)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy9" onchange="saveProgress()">
-                    <label for="sy9">더블 데이트하기(내 동생이랑)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy10" onchange="saveProgress()">
-                    <label for="sy10">반지공방 가기(원데이 클래스)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy11" onchange="saveProgress()">
-                    <label for="sy11">다위쌤한테 쿠키 만드는거 배우기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy12" onchange="saveProgress()">
-                    <label for="sy12">다위한테 도시락 만들어주기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy13" onchange="saveProgress()">
-                    <label for="sy13">다위한테 깜짝 선물하기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy14" onchange="saveProgress()">
-                    <label for="sy14">같이 결혼식장 알아보기~(내가 꿈이 거창함)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy15" onchange="saveProgress()">
-                    <label for="sy15">불장난(은어임)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy16" onchange="saveProgress()">
-                    <label for="sy16">담배 끊기(수영 한정) - 다시는 안피고 싶을만큼</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy17" onchange="saveProgress()">
-                    <label for="sy17">다위네 동네 놀러가기 (화성시 봉담읍)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy18" onchange="saveProgress()">
-                    <label for="sy18">빠지 가서 바나나 보트 타기~</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy19" onchange="saveProgress()">
-                    <label for="sy19">겨울에 워터파크 가기 (온숫물이라 따수움)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy20" onchange="saveProgress()">
-                    <label for="sy20">ㅍㄹㅍㅈ(알잘딱깍센)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy21" onchange="saveProgress()">
-                    <label for="sy21">이번년도 가기 전에 방도모임 같이 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy22" onchange="saveProgress()">
-                    <label for="sy22">예술에 전당에서 좋은 공연 같이 보기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy23" onchange="saveProgress()">
-                    <label for="sy23">애견카페 같이가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy24" onchange="saveProgress()">
-                    <label for="sy24">다위 옷 골라주기(쇼핑몰 같이 가서)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy25" onchange="saveProgress()">
-                    <label for="sy25">같이 런닝 뛰기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy26" onchange="saveProgress()">
-                    <label for="sy26">같이 미친척하고 한번은 놀아보기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="sy27" onchange="saveProgress()">
-                    <label for="sy27">다위 네일한번 해주기</label>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar" id="progressBar">0%</div>
                 </div>
             </div>
-        </div>
 
-        <!-- 다위 섹션 -->
-        <div class="section">
-            <div class="section-header" onclick="toggleSection('dawi')">
-                <span class="section-icon">🎮</span>
-                <h2 class="section-title">다위의 위시리스트</h2>
-                <span class="section-count" id="dawi-count">0/0</span>
+            <!-- 수영 섹션 -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">🏊‍♀️</span>
+                    <h2 class="section-title">수영의 위시리스트</h2>
+                    <span class="section-count" id="suyoung-count">0/0</span>
+                </div>
+                
+                <div class="add-item-container">
+                    <input type="text" class="add-input" id="suyoung-input" 
+                           placeholder="새로운 위시 추가하기 💭" 
+                           onkeypress="if(event.key==='Enter') addItem('suyoung')">
+                    <button class="add-btn" onclick="addItem('suyoung')">➕ 추가</button>
+                </div>
+                
+                <div id="suyoung-list"></div>
             </div>
-            <div id="dawi-list">
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw1" onchange="saveProgress()">
-                    <label for="dw1">찜질방 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw2" onchange="saveProgress()">
-                    <label for="dw2">수영이네 교회 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw3" onchange="saveProgress()">
-                    <label for="dw3">수영이랑 사랑부 수련회 봉사가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw4" onchange="saveProgress()">
-                    <label for="dw4">만화카페 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw5" onchange="saveProgress()">
-                    <label for="dw5">등산하기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw6" onchange="saveProgress()">
-                    <label for="dw6">경주월드 가기 (Full Course)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw7" onchange="saveProgress()">
-                    <label for="dw7">캠핑 하러가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw8" onchange="saveProgress()">
-                    <label for="dw8">더블 데이트하기(내 칭구랑)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw9" onchange="saveProgress()">
-                    <label for="dw9">커플티 맞추기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw10" onchange="saveProgress()">
-                    <label for="dw10">도자기 공방(원데이 클래스)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw11" onchange="saveProgress()">
-                    <label for="dw11">수영이한테 맛있는 음식 만들어주기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw12" onchange="saveProgress()">
-                    <label for="dw12">수영이한테 깜짝 선물하기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw13" onchange="saveProgress()">
-                    <label for="dw13">밤새 놀기(날밤까기)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw14" onchange="saveProgress()">
-                    <label for="dw14">마사지 받으러 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw15" onchange="saveProgress()">
-                    <label for="dw15">바다 수영 하기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw16" onchange="saveProgress()">
-                    <label for="dw16">수영이 운전기사 해주기 (헐... 감동)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw17" onchange="saveProgress()">
-                    <label for="dw17">스키장 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw18" onchange="saveProgress()">
-                    <label for="dw18">일본 온천가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw19" onchange="saveProgress()">
-                    <label for="dw19">호세랑 같이 놀기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw20" onchange="saveProgress()">
-                    <label for="dw20">베드민턴 같이 치기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw21" onchange="saveProgress()">
-                    <label for="dw21">공포영화 같이보기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw22" onchange="saveProgress()">
-                    <label for="dw22">뮤지컬 보러가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw23" onchange="saveProgress()">
-                    <label for="dw23">재즈 bar 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw24" onchange="saveProgress()">
-                    <label for="dw24">수영 옷 골라주기(쇼핑몰 같이 가서) - 이하동문</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw25" onchange="saveProgress()">
-                    <label for="dw25">기념일날 똑같은 지역을 잡아서 기념일마다 사진 찍기(릴스에 자주 나오는거)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw26" onchange="saveProgress()">
-                    <label for="dw26">같이 머리하러 가기</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw27" onchange="saveProgress()">
-                    <label for="dw27">손편지 쓰기(서로)</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="dw28" onchange="saveProgress()">
-                    <label for="dw28">싸웠을때도 사랑한다구 말해주기</label>
-                </div>
-            </div>
-        </div>
 
-        <div class="footer">
-            <div class="footer-text">하나 이루면 하나씩 체크해주기 💝</div>
-            <div class="footer-date">~ 2027년 10월까지 ~</div>
-            <button class="reset-btn" onclick="resetProgress()">🔄 처음부터 다시 시작</button>
+            <!-- 다위 섹션 -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">🎮</span>
+                    <h2 class="section-title">다위의 위시리스트</h2>
+                    <span class="section-count" id="dawi-count">0/0</span>
+                </div>
+                
+                <div class="add-item-container">
+                    <input type="text" class="add-input" id="dawi-input" 
+                           placeholder="새로운 위시 추가하기 💭"
+                           onkeypress="if(event.key==='Enter') addItem('dawi')">
+                    <button class="add-btn" onclick="addItem('dawi')">➕ 추가</button>
+                </div>
+                
+                <div id="dawi-list"></div>
+            </div>
+
+            <div class="footer">
+                <div class="footer-text">하나 이루면 하나씩 체크해주기 💝</div>
+                <div class="footer-date">~ 2027년 10월까지 ~</div>
+            </div>
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, push, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // ⭐ 여기에 Firebase Config 붙여넣기! ⭐
+        const firebaseConfig = {
+        apiKey: "AIzaSyAZP3IWLyTVgUUFuKgfpwOvks3al1i7mYs",
+        authDomain: "couple-wishlist.firebaseapp.com",
+        databaseURL: "https://couple-wishlist-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "couple-wishlist",
+        storageBucket: "couple-wishlist.firebasestorage.app",
+        messagingSenderId: "983076114841",
+        appId: "1:983076114841:web:23e69de303e139f5f90308",
+        measurementId: "G-FQ2HZHTB98"
+      };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // 전역 함수 노출
+        window.addItem = addItem;
+        window.toggleItem = toggleItem;
+        window.deleteItem = deleteItem;
+
+        // 초기화
+        let suyoungData = {};
+        let dawiData = {};
+
         window.onload = function() {
-            loadProgress();
+            initializeWishlist();
         };
 
-        function saveProgress() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            const state = {};
-            
-            checkboxes.forEach(checkbox => {
-                state[checkbox.id] = checkbox.checked;
-                checkbox.parentElement.classList.toggle('checked', checkbox.checked);
-                
-                // 체크할 때 하트 애니메이션
-                if (checkbox.checked && !checkbox.dataset.animated) {
-                    createHeartAnimation(event);
-                    checkbox.dataset.animated = 'true';
-                } else if (!checkbox.checked) {
-                    checkbox.dataset.animated = '';
-                }
-            });
-            
-            localStorage.setItem('coupleWishlist', JSON.stringify(state));
-            updateAllStats();
+        // 초기 데이터 설정 (한 번만 실행)
+        function initializeWishlist() {
+            const initialData = {
+                suyoung: [
+                    "드라이브 하고 근교 맛집 가기(ex. 간장게장)",
+                    "다위내 교회 가기",
+                    "다위랑 스티커 사진 찍기",
+                    "다위랑 바다 놀러가기",
+                    "낚시",
+                    "연차내고 다위랑 하루종일 같이 지내기",
+                    "롯데월드 가기",
+                    "합주하기(트리오나 듀엣으로)",
+                    "더블 데이트하기(내 동생이랑)",
+                    "반지공방 가기(원데이 클래스)",
+                    "다위쌤한테 쿠키 만드는거 배우기",
+                    "다위한테 도시락 만들어주기",
+                    "다위한테 깜짝 선물하기",
+                    "같이 결혼식장 알아보기~(내가 꿈이 거창함)",
+                    "불장난(은어임)",
+                    "담배 끊기(수영 한정) - 다시는 안피고 싶을만큼",
+                    "다위네 동네 놀러가기 (화성시 봉담읍)",
+                    "빠지 가서 바나나 보트 타기~",
+                    "겨울에 워터파크 가기 (온숫물이라 따수움)",
+                    "ㅍㄹㅍㅈ(알잘딱깍센)",
+                    "이번년도 가기 전에 방도모임 같이 가기",
+                    "예술에 전당에서 좋은 공연 같이 보기",
+                    "애견카페 같이가기",
+                    "다위 옷 골라주기(쇼핑몰 같이 가서)",
+                    "같이 런닝 뛰기",
+                    "같이 미친척하고 한번은 놀아보기",
+                    "다위 네일한번 해주기"
+                ],
+                dawi: [
+                    "찜질방 가기",
+                    "수영이네 교회 가기",
+                    "수영이랑 사랑부 수련회 봉사가기",
+                    "만화카페 가기",
+                    "등산하기",
+                    "경주월드 가기 (Full Course)",
+                    "캠핑 하러가기",
+                    "더블 데이트하기(내 칭구랑)",
+                    "커플티 맞추기",
+                    "도자기 공방(원데이 클래스)",
+                    "수영이한테 맛있는 음식 만들어주기",
+                    "수영이한테 깜짝 선물하기",
+                    "밤새 놀기(날밤까기)",
+                    "마사지 받으러 가기",
+                    "바다 수영 하기",
+                    "수영이 운전기사 해주기 (헐... 감동)",
+                    "스키장 가기",
+                    "일본 온천가기",
+                    "호세랑 같이 놀기",
+                    "베드민턴 같이 치기",
+                    "공포영화 같이보기",
+                    "뮤지컬 보러가기",
+                    "재즈 bar 가기",
+                    "수영 옷 골라주기(쇼핑몰 같이 가서) - 이하동문",
+                    "기념일날 똑같은 지역을 잡아서 기념일마다 사진 찍기(릴스에 자주 나오는거)",
+                    "같이 머리하러 가기",
+                    "손편지 쓰기(서로)",
+                    "싸웠을때도 사랑한다구 말해주기"
+                ]
+            };
+
+            // 수영 리스트 로드
+            loadWishlist('suyoung', initialData.suyoung);
+            // 다위 리스트 로드
+            loadWishlist('dawi', initialData.dawi);
         }
 
-        function loadProgress() {
-            const saved = localStorage.getItem('coupleWishlist');
-            if (saved) {
-                const state = JSON.parse(saved);
-                Object.keys(state).forEach(id => {
-                    const checkbox = document.getElementById(id);
-                    if (checkbox) {
-                        checkbox.checked = state[id];
-                        checkbox.parentElement.classList.toggle('checked', state[id]);
-                    }
+        // 위시리스트 로드
+        function loadWishlist(section, initialItems = []) {
+            const wishlistRef = ref(database, `wishlist/${section}`);
+            
+            onValue(wishlistRef, (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById(`${section}-list`);
+                container.innerHTML = '';
+                
+                // 데이터 저장
+                if (section === 'suyoung') suyoungData = data || {};
+                else dawiData = data || {};
+                
+                if (data) {
+                    // 생성 시간순으로 정렬
+                    const sortedKeys = Object.keys(data).sort((a, b) => 
+                        (data[a].createdAt || 0) - (data[b].createdAt || 0)
+                    );
+                    
+                    sortedKeys.forEach(key => {
+                        const item = data[key];
+                        addItemToDOM(section, key, item.text, item.checked);
+                    });
+                } else if (initialItems.length > 0) {
+                    // 초기 데이터가 없으면 기본 항목 추가
+                    initialItems.forEach(text => {
+                        const newItemRef = push(wishlistRef);
+                        set(newItemRef, {
+                            text: text,
+                            checked: false,
+                            createdAt: Date.now()
+                        });
+                    });
+                }
+                
+                // 로딩 완료
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                
+                updateStats();
+            });
+        }
+
+        // DOM에 항목 추가
+        function addItemToDOM(section, id, text, checked) {
+            const container = document.getElementById(`${section}-list`);
+            const div = document.createElement('div');
+            div.className = 'checklist-item' + (checked ? ' checked' : '');
+            div.innerHTML = `
+                <input type="checkbox" ${checked ? 'checked' : ''} 
+                    onchange="toggleItem('${section}', '${id}')">
+                <label onclick="toggleItem('${section}', '${id}')">${text}</label>
+                <button class="delete-btn" onclick="deleteItem('${section}', '${id}')" 
+                        title="삭제">🗑️</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 새 항목 추가
+        function addItem(section) {
+            const input = document.getElementById(`${section}-input`);
+            const text = input.value.trim();
+            
+            if (!text) {
+                alert('위시를 입력해주세요! 💭');
+                return;
+            }
+            
+            const wishlistRef = ref(database, `wishlist/${section}`);
+            const newItemRef = push(wishlistRef);
+            
+            set(newItemRef, {
+                text: text,
+                checked: false,
+                createdAt: Date.now()
+            }).then(() => {
+                input.value = '';
+                createHeartAnimation(event);
+            }).catch((error) => {
+                alert('추가 실패: ' + error.message);
+            });
+        }
+
+        // 체크 토글
+        function toggleItem(section, id) {
+            const itemRef = ref(database, `wishlist/${section}/${id}`);
+            const data = section === 'suyoung' ? suyoungData : dawiData;
+            const item = data[id];
+            
+            if (item) {
+                update(itemRef, {
+                    checked: !item.checked
+                }).then(() => {
+                    createHeartAnimation(event);
                 });
             }
-            updateAllStats();
         }
 
-        function updateAllStats() {
+        // 항목 삭제
+        function deleteItem(section, id) {
+            if (confirm('정말 삭제할까요? 💔')) {
+                const itemRef = ref(database, `wishlist/${section}/${id}`);
+                remove(itemRef).catch((error) => {
+                    alert('삭제 실패: ' + error.message);
+                });
+            }
+        }
+
+        // 통계 업데이트
+        function updateStats() {
             // 전체 통계
             const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
             const total = allCheckboxes.length;
             const completed = Array.from(allCheckboxes).filter(cb => cb.checked).length;
-            const remaining = total - completed;
-            const percentage = Math.round((completed / total) * 100);
             
             document.getElementById('totalCount').textContent = total;
             document.getElementById('completedCount').textContent = completed;
-            document.getElementById('remainingCount').textContent = remaining;
+            document.getElementById('remainingCount').textContent = total - completed;
             
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             const progressBar = document.getElementById('progressBar');
             progressBar.style.width = percentage + '%';
             progressBar.textContent = percentage + '%';
 
-            // 수영 섹션 통계
-            updateSectionCount('suyoung', 'sy');
-            // 다위 섹션 통계
-            updateSectionCount('dawi', 'dw');
+            // 섹션별 통계
+            updateSectionCount('suyoung');
+            updateSectionCount('dawi');
         }
 
-        function updateSectionCount(section, prefix) {
-            const checkboxes = Array.from(document.querySelectorAll(`input[id^="${prefix}"]`));
+        function updateSectionCount(section) {
+            const container = document.getElementById(`${section}-list`);
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
             const total = checkboxes.length;
-            const completed = checkboxes.filter(cb => cb.checked).length;
+            const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
             document.getElementById(`${section}-count`).textContent = `${completed}/${total}`;
         }
 
-        function toggleSection(section) {
-            const list = document.getElementById(`${section}-list`);
-            if (list.style.display === 'none') {
-                list.style.display = 'block';
-            } else {
-                list.style.display = 'none';
-            }
-        }
-
+        // 하트 애니메이션
         function createHeartAnimation(e) {
+            if (!e || !e.clientX) return;
+            
             const heart = document.createElement('div');
-            heart.className = 'heart-animation';
             heart.textContent = ['💖', '💕', '💗', '💝'][Math.floor(Math.random() * 4)];
-            heart.style.left = e.clientX + 'px';
-            heart.style.top = e.clientY + 'px';
+            heart.style.cssText = `
+                position: fixed;
+                left: ${e.clientX}px;
+                top: ${e.clientY}px;
+                font-size: 2em;
+                pointer-events: none;
+                animation: float-up 2s ease-out forwards;
+                z-index: 1000;
+            `;
             document.body.appendChild(heart);
             
             setTimeout(() => heart.remove(), 2000);
-        }
-
-        function resetProgress() {
-            if (confirm('정말 처음부터 다시 시작할까요? 💔')) {
-                localStorage.removeItem('coupleWishlist');
-                location.reload();
-            }
         }
     </script>
 </body>
